@@ -4,6 +4,10 @@ import android.os.Bundle
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import legom.gpstracker.databinding.ActivityMainBinding
+import legom.gpstracker.fragments.MainFragment
+import legom.gpstracker.fragments.SettingsFragment
+import legom.gpstracker.fragments.TracksFragment
+import legom.gpstracker.utils.openFragment
 
 class MainActivity : AppCompatActivity() {
 
@@ -13,23 +17,16 @@ class MainActivity : AppCompatActivity() {
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
         onButtonNavClicks()
+        openFragment(MainFragment.newInstance())
     }
 
 
     private fun onButtonNavClicks() {
         binding.bNav.setOnItemSelectedListener {
             when (it.itemId) {
-                R.id.id_home -> {
-                    Toast.makeText(this, "home", Toast.LENGTH_SHORT).show()
-                }
-
-                R.id.id_tracks -> {
-                    Toast.makeText(this, "tracks", Toast.LENGTH_SHORT).show()
-                }
-
-                R.id.id_settings -> {
-                    Toast.makeText(this, "settings", Toast.LENGTH_SHORT).show()
-                }
+                R.id.id_home -> openFragment(MainFragment.newInstance())
+                R.id.id_tracks -> openFragment(TracksFragment.newInstance())
+                R.id.id_settings -> openFragment(SettingsFragment.newInstance())
             }
             true
         }
