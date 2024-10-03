@@ -1,6 +1,7 @@
 package legom.gpstracker
 
 import android.os.Bundle
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import legom.gpstracker.databinding.ActivityMainBinding
 
@@ -11,5 +12,26 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
+        onButtonNavClicks()
+    }
+
+
+    private fun onButtonNavClicks() {
+        binding.bNav.setOnItemSelectedListener {
+            when (it.itemId) {
+                R.id.id_home -> {
+                    Toast.makeText(this, "home", Toast.LENGTH_SHORT).show()
+                }
+
+                R.id.id_tracks -> {
+                    Toast.makeText(this, "tracks", Toast.LENGTH_SHORT).show()
+                }
+
+                R.id.id_settings -> {
+                    Toast.makeText(this, "settings", Toast.LENGTH_SHORT).show()
+                }
+            }
+            true
+        }
     }
 }
