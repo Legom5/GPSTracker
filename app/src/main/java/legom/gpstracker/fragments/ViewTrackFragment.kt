@@ -7,16 +7,17 @@ import android.view.View
 import android.view.ViewGroup
 import legom.gpstracker.R
 import legom.gpstracker.databinding.FragmentMainBinding
+import legom.gpstracker.databinding.ViewTrackBinding
 
 class ViewTrackFragment : Fragment() {
 
-    private lateinit var binding: FragmentMainBinding
+    private lateinit var binding: ViewTrackBinding
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        binding = FragmentMainBinding.inflate(inflater, container, false)
+        binding = ViewTrackBinding.inflate(inflater, container, false)
         return binding.root
     }
 
