@@ -1,7 +1,6 @@
 package legom.gpstracker
 
 import android.os.Bundle
-import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import legom.gpstracker.databinding.ActivityMainBinding
 import legom.gpstracker.fragments.MainFragment
