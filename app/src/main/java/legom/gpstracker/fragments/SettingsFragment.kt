@@ -1,26 +1,60 @@
 package legom.gpstracker.fragments
 
+import android.graphics.Color
 import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
-import androidx.fragment.app.Fragment
-import legom.gpstracker.databinding.SettingsBinding
+import androidx.preference.Preference
+import androidx.preference.Preference.OnPreferenceChangeListener
+import androidx.preference.PreferenceFragmentCompat
+import legom.gpstracker.R
 
-class SettingsFragment : Fragment() {
+class SettingsFragment : PreferenceFragmentCompat() {
 
-    private lateinit var binding: SettingsBinding
+    private lateinit var timePref: Preference
+    private lateinit var colorPref: Preference
 
-    override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View {
-        binding = SettingsBinding.inflate(inflater, container, false)
-        return binding.root
+
+    override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
+        setPreferencesFromResource(R.xml.main_preference, rootKey)
+        init()
     }
 
-    companion object {
-        @JvmStatic
-        fun newInstance() = SettingsFragment()
+    private fun init() {
+        timePref = findPreference("update_time_key") ?: throw RuntimeException("Unknown key")
+        colorPref = findPreference("color_key") ?: throw RuntimeException("Unknown key")
+        val changeListener = onChangeListener()
+        timePref.onPreferenceChangeListener = changeListener
+        colorPref.onPreferenceChangeListener = changeListener
+        initPrefs()
     }
+
+    private fun onChangeListener(): OnPreferenceChangeListener {
+        return OnPreferenceChangeListener { pref, newValue ->
+            when(pref.key){
+                "update_time_key"-> onTimeChange(newValue.toString())
+                "color_key" -> pref.icon?.setTint(Color.parseColor(newValue.toString()))
+            }
+            true
+        }
+    }
+
+    private fun onTimeChange(newValue: String){
+        val nameArray = resources.getStringArray(R.array.loc_time_update_name)
+        val valueArray = resources.getStringArray(R.array.loc_time_update_value)
+        val title = timePref.title.toString().substringBefore(":")
+        timePref.title = "$title: ${nameArray[valueArray.indexOf(newValue)]}"
+    }
+
+
+    private fun initPrefs() {
+        val pref = timePref.preferenceManager.sharedPreferences
+        val nameArray = resources.getStringArray(R.array.loc_time_update_name)
+        val valueArray = resources.getStringArray(R.array.loc_time_update_value)
+        val title = timePref.title
+        timePref.title =
+            "$title: ${nameArray[valueArray.indexOf(pref?.getString("update_time_key", "3000"))]}"
+
+        val trackColor = pref?.getString("color_key", "#FF000000")
+        colorPref.icon?.setTint(Color.parseColor(trackColor))
+    }
+
 }
