@@ -45,6 +45,9 @@ dependencies {
 
     implementation (libs.androidx.preference.ktx)
 
+    implementation(libs.osmdroid.android)
+    implementation(libs.osmbonuspack)
+
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)
     implementation(libs.material)
