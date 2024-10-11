@@ -16,16 +16,16 @@ class MainActivity : AppCompatActivity() {
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
         onButtonNavClicks()
-        openFragment(MainFragment.newInstance())
+        openFragment(MainFragment.newInstance(), "main")
     }
 
 
     private fun onButtonNavClicks() {
         binding.bNav.setOnItemSelectedListener {
             when (it.itemId) {
-                R.id.id_home -> openFragment(MainFragment.newInstance())
-                R.id.id_tracks -> openFragment(TracksFragment.newInstance())
-                R.id.id_settings -> openFragment(SettingsFragment())
+                R.id.id_home -> openFragment(MainFragment.newInstance(), "main")
+                R.id.id_tracks -> openFragment(TracksFragment.newInstance(), "tracks")
+                R.id.id_settings -> openFragment(SettingsFragment(), "settings")
             }
             true
         }
