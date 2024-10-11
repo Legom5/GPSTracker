@@ -2,9 +2,11 @@ package legom.gpstracker.fragments
 
 import android.Manifest
 import android.content.Context
+import android.content.Intent
 import android.location.LocationManager
 import android.os.Build
 import android.os.Bundle
+import android.provider.Settings
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
@@ -44,7 +46,10 @@ class MainFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         registerPermission()
-        showToast("qwerty")
+    }
+
+    override fun onResume() {
+        super.onResume()
         checkLocPermission()
     }
 
@@ -141,12 +146,19 @@ class MainFragment : Fragment() {
         }
     }
 
-    private fun checkLocationEnabled(){
+    private fun checkLocationEnabled() {
         val lManager = activity?.getSystemService(Context.LOCATION_SERVICE) as LocationManager
         val isEnabled = lManager.isProviderEnabled(LocationManager.GPS_PROVIDER)
-        if (!isEnabled){
-            DialogManager.showLocEnabledDialog(activity as AppCompatActivity)
-        }else{
+        if (!isEnabled) {
+            DialogManager.showLocEnabledDialog(
+                activity as AppCompatActivity,
+                object : DialogManager.Listener{
+                    override fun onClick() {
+                        startActivity(Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS))
+                    }
+                }
+            )
+        } else {
             showToast("GPS включен")
         }
     }
