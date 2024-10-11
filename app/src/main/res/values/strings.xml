@@ -1,5 +1,7 @@
 <resources>
     <string name="app_name">GPSTracker</string>
+    <string name="yes">Yes</string>
+    <string name="no">No</string>
     <string name="home">Home</string>
     <string name="tracks">Tracks</string>
     <string name="settings">Settings</string>
@@ -8,4 +10,6 @@
     <string name="update_time_summary">Location update time</string>
     <string name="track_color">Track color</string>
     <string name="track_color_summary">Choose track color</string>
+    <string name="location_disabled">Location disabled</string>
+    <string name="location_dialog_message">Do you want enable GPS?</string>
 </resources>

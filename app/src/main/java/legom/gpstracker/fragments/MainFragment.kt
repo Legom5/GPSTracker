@@ -15,6 +15,7 @@ import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import legom.gpstracker.R
 import legom.gpstracker.databinding.FragmentMainBinding
+import legom.gpstracker.utils.DialogManager
 import legom.gpstracker.utils.checkPermission
 import legom.gpstracker.utils.showToast
 import org.osmdroid.config.Configuration
@@ -144,7 +145,7 @@ class MainFragment : Fragment() {
         val lManager = activity?.getSystemService(Context.LOCATION_SERVICE) as LocationManager
         val isEnabled = lManager.isProviderEnabled(LocationManager.GPS_PROVIDER)
         if (!isEnabled){
-            showToast("GPS выключен")
+            DialogManager.showLocEnabledDialog(activity as AppCompatActivity)
         }else{
             showToast("GPS включен")
         }
