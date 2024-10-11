@@ -2,6 +2,7 @@ package legom.gpstracker.fragments
 
 import android.Manifest
 import android.content.Context
+import android.location.LocationManager
 import android.os.Build
 import android.os.Bundle
 import androidx.fragment.app.Fragment
@@ -71,6 +72,7 @@ class MainFragment : Fragment() {
             registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) {
                 if (it[Manifest.permission.ACCESS_FINE_LOCATION] == true) {
                     initOSM()
+                    checkLocationEnabled()
                 } else {
                     showToast("Нет разрешения на использования местоположения")
                 }
@@ -96,6 +98,7 @@ class MainFragment : Fragment() {
             && checkPermission(Manifest.permission.ACCESS_BACKGROUND_LOCATION)
         ) {
             initOSM()
+            checkLocationEnabled()
         } else {
             pLauncher.launch(
                 arrayOf(
@@ -111,6 +114,7 @@ class MainFragment : Fragment() {
         if (checkPermission(Manifest.permission.ACCESS_FINE_LOCATION)
         ) {
             initOSM()
+            checkLocationEnabled()
         } else {
             requestPermissions(
                 arrayOf(
@@ -126,12 +130,23 @@ class MainFragment : Fragment() {
     private fun checkPermissionBefore10() {
         if (checkPermission(Manifest.permission.ACCESS_FINE_LOCATION)) {
             initOSM()
+            checkLocationEnabled()
         } else {
             pLauncher.launch(
                 arrayOf(
                     Manifest.permission.ACCESS_FINE_LOCATION
                 )
             )
+        }
+    }
+
+    private fun checkLocationEnabled(){
+        val lManager = activity?.getSystemService(Context.LOCATION_SERVICE) as LocationManager
+        val isEnabled = lManager.isProviderEnabled(LocationManager.GPS_PROVIDER)
+        if (!isEnabled){
+            showToast("GPS выключен")
+        }else{
+            showToast("GPS включен")
         }
     }
 
