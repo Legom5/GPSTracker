@@ -1,13 +1,17 @@
 package legom.gpstracker.location
 
+import android.Manifest
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.PendingIntent
 import android.app.Service
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.os.Build
 import android.os.IBinder
+import androidx.core.app.ActivityCompat
 import androidx.core.app.NotificationCompat
+import androidx.core.content.ContextCompat
 import legom.gpstracker.MainActivity
 import legom.gpstracker.R
 
@@ -31,6 +35,7 @@ class LocationService : Service() {
     }
 
     private fun startNotification() {
+
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             val nChannel = NotificationChannel(
                 CHANEL_ID,
