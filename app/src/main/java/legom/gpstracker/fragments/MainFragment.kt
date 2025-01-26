@@ -17,6 +17,7 @@ import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import legom.gpstracker.R
 import legom.gpstracker.databinding.FragmentMainBinding
+import legom.gpstracker.location.LocationService
 import legom.gpstracker.utils.DialogManager
 import legom.gpstracker.utils.checkPermission
 import legom.gpstracker.utils.showToast
@@ -46,6 +47,11 @@ class MainFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         registerPermission()
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            activity?.startForegroundService(Intent(activity, LocationService::class.java))
+        } else {
+            activity?.startService(Intent(activity, LocationService::class.java))
+        }
     }
 
     override fun onResume() {
