@@ -7,7 +7,6 @@ import android.location.LocationManager
 import android.os.Build
 import android.os.Bundle
 import android.provider.Settings
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.View.OnClickListener
@@ -16,21 +15,29 @@ import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
+import androidx.fragment.app.Fragment
+import androidx.lifecycle.MutableLiveData
 import legom.gpstracker.R
 import legom.gpstracker.databinding.FragmentMainBinding
 import legom.gpstracker.location.LocationService
 import legom.gpstracker.utils.DialogManager
+import legom.gpstracker.utils.TimeUtils
 import legom.gpstracker.utils.checkPermission
 import legom.gpstracker.utils.showToast
 import org.osmdroid.config.Configuration
 import org.osmdroid.library.BuildConfig
-import org.osmdroid.util.GeoPoint
 import org.osmdroid.views.overlay.mylocation.GpsMyLocationProvider
 import org.osmdroid.views.overlay.mylocation.MyLocationNewOverlay
+import java.util.Timer
+import java.util.TimerTask
 
 class MainFragment : Fragment() {
 
     private var isServiceRunning = false
+
+    private var timer: Timer? = null
+    private var startTime = 0L
+    private val timeData = MutableLiveData<String>()
 
     private val LOCATION_PERMISSION_REQUEST = 11
 
@@ -52,16 +59,17 @@ class MainFragment : Fragment() {
         registerPermission()
         setOnClicks()
         checkServiceState()
+        updateTime()
     }
 
-    private fun setOnClicks() = with(binding){
+    private fun setOnClicks() = with(binding) {
         val listener = onClicks()
         fStartStop.setOnClickListener(listener)
     }
 
-    private fun onClicks(): OnClickListener{
+    private fun onClicks(): OnClickListener {
         return OnClickListener {
-            when(it.id){
+            when (it.id) {
                 R.id.fStartStop -> {
                     startStopService()
                 }
@@ -69,30 +77,55 @@ class MainFragment : Fragment() {
         }
     }
 
-    private fun startStopService(){
-        if (!isServiceRunning){
+    private fun updateTime() {
+        timeData.observe(viewLifecycleOwner) {
+            binding.tvTime.text = it
+        }
+    }
+
+    private fun startTimer() {
+        timer?.cancel()
+        timer = Timer()
+        startTime = System.currentTimeMillis()
+        timer?.schedule(object : TimerTask() {
+            override fun run() {
+                activity?.runOnUiThread {
+                    timeData.value = getCurrentTime()
+                }
+            }
+        }, 1000, 1000)
+    }
+
+    private fun getCurrentTime(): String {
+        return getString(R.string.time, TimeUtils.getTime(System.currentTimeMillis() - startTime))
+    }
+
+    private fun startStopService() {
+        if (!isServiceRunning) {
             startLocService()
         } else {
             activity?.stopService(Intent(activity, LocationService::class.java))
             binding.fStartStop.setImageResource(R.drawable.ic_play)
+            timer?.cancel()
         }
         isServiceRunning = !isServiceRunning
     }
 
-    private fun checkServiceState(){
+    private fun checkServiceState() {
         isServiceRunning = LocationService.isRunning
-        if (isServiceRunning){
+        if (isServiceRunning) {
             binding.fStartStop.setImageResource(R.drawable.ic_stop)
         }
     }
 
-    private fun startLocService(){
+    private fun startLocService() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             activity?.startForegroundService(Intent(activity, LocationService::class.java))
         } else {
             activity?.startService(Intent(activity, LocationService::class.java))
         }
         binding.fStartStop.setImageResource(R.drawable.ic_stop)
+        startTimer()
     }
 
     override fun onResume() {
@@ -199,7 +232,7 @@ class MainFragment : Fragment() {
         if (!isEnabled) {
             DialogManager.showLocEnabledDialog(
                 activity as AppCompatActivity,
-                object : DialogManager.Listener{
+                object : DialogManager.Listener {
                     override fun onClick() {
                         startActivity(Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS))
                     }
