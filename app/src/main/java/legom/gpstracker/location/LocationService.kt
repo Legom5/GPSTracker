@@ -1,17 +1,13 @@
 package legom.gpstracker.location
 
-import android.Manifest
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.PendingIntent
 import android.app.Service
 import android.content.Intent
-import android.content.pm.PackageManager
 import android.os.Build
 import android.os.IBinder
-import androidx.core.app.ActivityCompat
 import androidx.core.app.NotificationCompat
-import androidx.core.content.ContextCompat
 import legom.gpstracker.MainActivity
 import legom.gpstracker.R
 
@@ -23,6 +19,7 @@ class LocationService : Service() {
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         startNotification()
+        isRunning = true
         return START_STICKY
     }
 
@@ -32,6 +29,7 @@ class LocationService : Service() {
 
     override fun onDestroy() {
         super.onDestroy()
+        isRunning = false
     }
 
     private fun startNotification() {
@@ -64,5 +62,6 @@ class LocationService : Service() {
 
     companion object {
         const val CHANEL_ID = "channel_1"
+        var isRunning = false
     }
 }

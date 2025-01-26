@@ -10,6 +10,7 @@ import android.provider.Settings
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
+import android.view.View.OnClickListener
 import android.view.ViewGroup
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
@@ -29,6 +30,8 @@ import org.osmdroid.views.overlay.mylocation.MyLocationNewOverlay
 
 class MainFragment : Fragment() {
 
+    private var isServiceRunning = false
+
     private val LOCATION_PERMISSION_REQUEST = 11
 
     private lateinit var pLauncher: ActivityResultLauncher<Array<String>>
@@ -47,11 +50,49 @@ class MainFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         registerPermission()
+        setOnClicks()
+        checkServiceState()
+    }
+
+    private fun setOnClicks() = with(binding){
+        val listener = onClicks()
+        fStartStop.setOnClickListener(listener)
+    }
+
+    private fun onClicks(): OnClickListener{
+        return OnClickListener {
+            when(it.id){
+                R.id.fStartStop -> {
+                    startStopService()
+                }
+            }
+        }
+    }
+
+    private fun startStopService(){
+        if (!isServiceRunning){
+            startLocService()
+        } else {
+            activity?.stopService(Intent(activity, LocationService::class.java))
+            binding.fStartStop.setImageResource(R.drawable.ic_play)
+        }
+        isServiceRunning = !isServiceRunning
+    }
+
+    private fun checkServiceState(){
+        isServiceRunning = LocationService.isRunning
+        if (isServiceRunning){
+            binding.fStartStop.setImageResource(R.drawable.ic_stop)
+        }
+    }
+
+    private fun startLocService(){
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             activity?.startForegroundService(Intent(activity, LocationService::class.java))
         } else {
             activity?.startService(Intent(activity, LocationService::class.java))
         }
+        binding.fStartStop.setImageResource(R.drawable.ic_stop)
     }
 
     override fun onResume() {
