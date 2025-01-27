@@ -14,6 +14,7 @@ import android.os.Looper
 import android.util.Log
 import androidx.core.app.ActivityCompat
 import androidx.core.app.NotificationCompat
+import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationCallback
 import com.google.android.gms.location.LocationRequest
@@ -70,12 +71,19 @@ class LocationService : Service() {
                         distance,
                         geoPointsList
                     )
+                    sendLocData(locModel)
                 }
             }
             lastLocation = currentLocation
 
             Log.d("MyLog", "Location: $distance")
         }
+    }
+
+    private fun sendLocData(locModel: LocationModel){
+        val i = Intent(LOC_MODEL_INTENT)
+        i.putExtra(LOC_MODEL_INTENT, locModel)
+        LocalBroadcastManager.getInstance(applicationContext).sendBroadcast(i)
     }
 
     private fun startNotification() {
@@ -129,6 +137,7 @@ class LocationService : Service() {
     }
 
     companion object {
+        const val LOC_MODEL_INTENT = "loc_intent"
         const val CHANEL_ID = "channel_1"
         var isRunning = false
         var startTime = 0L
