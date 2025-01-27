@@ -43,6 +43,8 @@ android {
 
 dependencies {
 
+    implementation(libs.play.services.location)
+
     implementation (libs.androidx.preference.ktx)
 
     implementation(libs.osmdroid.android)
