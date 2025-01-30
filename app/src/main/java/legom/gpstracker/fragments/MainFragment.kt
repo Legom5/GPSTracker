@@ -1,28 +1,25 @@
 package legom.gpstracker.fragments
 
 import android.Manifest
-import android.annotation.SuppressLint
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
+import android.graphics.Color
 import android.location.LocationManager
 import android.os.Build
 import android.os.Bundle
 import android.provider.Settings
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.View.OnClickListener
 import android.view.ViewGroup
-import android.widget.Toast
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
-import androidx.lifecycle.MutableLiveData
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import legom.gpstracker.MainViewModel
 import legom.gpstracker.R
@@ -35,6 +32,8 @@ import legom.gpstracker.utils.checkPermission
 import legom.gpstracker.utils.showToast
 import org.osmdroid.config.Configuration
 import org.osmdroid.library.BuildConfig
+import org.osmdroid.util.GeoPoint
+import org.osmdroid.views.overlay.Polyline
 import org.osmdroid.views.overlay.mylocation.GpsMyLocationProvider
 import org.osmdroid.views.overlay.mylocation.MyLocationNewOverlay
 import java.util.Timer
@@ -42,7 +41,11 @@ import java.util.TimerTask
 
 class MainFragment : Fragment() {
 
+    private var pl: Polyline? = null
+
     private var isServiceRunning = false
+
+    private var firstStart = true
 
     private var timer: Timer? = null
     private var startTime = 0L
@@ -99,6 +102,7 @@ class MainFragment : Fragment() {
             tvDistance.text = distance
             tvVelocity.text = velocity
             tvAverageVel.text = aVelocity
+            updatePolyline(it.geoPointsList)
         }
     }
 
@@ -123,8 +127,11 @@ class MainFragment : Fragment() {
 
 
     private fun getAverageSpeed(distance: Float): String {
-      return String
-          .format("%.1f", 3.6f * (distance / ((System.currentTimeMillis() - startTime) / 1000.0f)))
+        return String
+            .format(
+                "%.1f",
+                3.6f * (distance / ((System.currentTimeMillis() - startTime) / 1000.0f))
+            )
     }
 
     private fun getCurrentTime(): String {
@@ -175,6 +182,8 @@ class MainFragment : Fragment() {
     }
 
     private fun initOSM() = with(binding) {
+        pl = Polyline()
+        pl?.outlinePaint?.color = Color.RED
         map.controller.setZoom(20.0)
         val mLocProvide = GpsMyLocationProvider(activity)
         val mLocOverlay = MyLocationNewOverlay(mLocProvide, map)
@@ -183,6 +192,7 @@ class MainFragment : Fragment() {
         mLocOverlay.runOnFirstFix {
             map.overlays.clear()
             map.overlays.add(mLocOverlay)
+            map.overlays.add(pl)
         }
     }
 
@@ -293,6 +303,30 @@ class MainFragment : Fragment() {
             .registerReceiver(receiver, locFilter)
     }
 
+    private fun addPoint(list: List<GeoPoint>){
+        pl?.addPoint(list[list.size - 1])
+    }
+
+    private fun fillPolyLine(list: List<GeoPoint>){
+        list.forEach {
+            pl?.addPoint(it)
+        }
+    }
+
+    private fun updatePolyline(list: List<GeoPoint>){
+        if (list.size > 1 && firstStart){
+            fillPolyLine(list)
+            firstStart = false
+        } else {
+            addPoint(list)
+        }
+    }
+
+    override fun onDetach() {
+        super.onDetach()
+        LocalBroadcastManager.getInstance(activity as AppCompatActivity)
+            .unregisterReceiver(receiver)
+    }
 
     companion object {
         @JvmStatic
