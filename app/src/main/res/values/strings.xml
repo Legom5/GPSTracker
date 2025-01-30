@@ -16,4 +16,5 @@
     <string name="distance_m">Distance: %1$s m</string>
     <string name="velocity_km_h">Velocity: %1$s km/h</string>
     <string name="average_velocity_km_h">Average velocity: %1$s km/h</string>
+    <string name="save_this_track">Save this track?</string>
 </resources>
