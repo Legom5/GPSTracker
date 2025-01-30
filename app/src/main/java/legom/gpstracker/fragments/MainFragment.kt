@@ -1,6 +1,7 @@
 package legom.gpstracker.fragments
 
 import android.Manifest
+import android.annotation.SuppressLint
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
@@ -89,12 +90,15 @@ class MainFragment : Fragment() {
         }
     }
 
-    private fun locationUpdates() = with(binding){
-        model.locationUpdates.observe(viewLifecycleOwner){
+    private fun locationUpdates() = with(binding) {
+        model.locationUpdates.observe(viewLifecycleOwner) {
             val distance = getString(R.string.distance_m, String.format("%.1f", it.distance))
-            val velocity = getString(R.string.velocity_km_h, String.format("%.1f", 3.6 * it.velocity))
+            val velocity =
+                getString(R.string.velocity_km_h, String.format("%.1f", 3.6f * it.velocity))
+            val aVelocity = getString(R.string.average_velocity_km_h, getAverageSpeed(it.distance))
             tvDistance.text = distance
             tvVelocity.text = velocity
+            tvAverageVel.text = aVelocity
         }
     }
 
@@ -115,6 +119,12 @@ class MainFragment : Fragment() {
                 }
             }
         }, 1000, 1000)
+    }
+
+
+    private fun getAverageSpeed(distance: Float): String {
+      return String
+          .format("%.1f", 3.6f * (distance / ((System.currentTimeMillis() - startTime) / 1000.0f)))
     }
 
     private fun getCurrentTime(): String {
