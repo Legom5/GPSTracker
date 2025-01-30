@@ -13,4 +13,6 @@
     <string name="location_disabled">Location disabled</string>
     <string name="location_dialog_message">Do you want enable GPS?</string>
     <string name="time">Time: %1$s</string>
+    <string name="distance_m">Distance: %1$s m</string>
+    <string name="velocity_km_h">Velocity: %1$s km/h</string>
 </resources>
