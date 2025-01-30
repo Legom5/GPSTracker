@@ -23,6 +23,7 @@ import com.google.android.gms.location.LocationServices
 import com.google.android.gms.location.Priority.PRIORITY_HIGH_ACCURACY
 import legom.gpstracker.MainActivity
 import legom.gpstracker.R
+import legom.gpstracker.utils.showToast
 import org.osmdroid.util.GeoPoint
 
 class LocationService : Service() {
@@ -63,7 +64,7 @@ class LocationService : Service() {
             super.onLocationResult(lResult)
             val currentLocation = lResult.lastLocation
             if (lastLocation != null && currentLocation != null) {
-                if (currentLocation.speed > 0.2) {
+//                if (currentLocation.speed > 0.2) {
                     distance += lastLocation?.distanceTo(currentLocation) ?: 0.0f
                     geoPointsList.add(GeoPoint(currentLocation.latitude, currentLocation.longitude))
                     val locModel = LocationModel(
@@ -72,7 +73,7 @@ class LocationService : Service() {
                         geoPointsList
                     )
                     sendLocData(locModel)
-                }
+//                }
             }
             lastLocation = currentLocation
 
