@@ -24,6 +24,7 @@ import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import legom.gpstracker.MainViewModel
 import legom.gpstracker.R
 import legom.gpstracker.databinding.FragmentMainBinding
+import legom.gpstracker.db.TrackItem
 import legom.gpstracker.location.LocationModel
 import legom.gpstracker.location.LocationService
 import legom.gpstracker.utils.DialogManager
@@ -40,6 +41,8 @@ import java.util.Timer
 import java.util.TimerTask
 
 class MainFragment : Fragment() {
+
+    private var trackItem: TrackItem? = null
 
     private var pl: Polyline? = null
 
@@ -102,6 +105,14 @@ class MainFragment : Fragment() {
             tvDistance.text = distance
             tvVelocity.text = velocity
             tvAverageVel.text = aVelocity
+            trackItem = TrackItem(
+                null,
+                getCurrentTime(),
+                TimeUtils.getDate(),
+                getString(R.string.distance_km, String.format("%.1f", it.distance / 1000)),
+                getString(R.string.average_velocity_km_h, getAverageSpeed(it.distance)),
+                ""
+            )
             updatePolyline(it.geoPointsList)
         }
     }
@@ -145,7 +156,10 @@ class MainFragment : Fragment() {
             activity?.stopService(Intent(activity, LocationService::class.java))
             binding.fStartStop.setImageResource(R.drawable.ic_play)
             timer?.cancel()
-            DialogManager.showSaveDialog(requireContext(), object : DialogManager.Listener{
+            DialogManager.showSaveDialog(
+                requireContext(),
+                trackItem,
+                object : DialogManager.Listener{
                 override fun onClick() {
                     showToast("Track Saved!")
                 }
