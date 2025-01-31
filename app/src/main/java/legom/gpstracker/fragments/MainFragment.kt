@@ -10,6 +10,7 @@ import android.location.LocationManager
 import android.os.Build
 import android.os.Bundle
 import android.provider.Settings
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.View.OnClickListener
@@ -42,7 +43,7 @@ import java.util.TimerTask
 
 class MainFragment : Fragment() {
 
-    private var trackItem: TrackItem? = null
+    private var locationModel: LocationModel? = null
 
     private var pl: Polyline? = null
 
@@ -105,14 +106,7 @@ class MainFragment : Fragment() {
             tvDistance.text = distance
             tvVelocity.text = velocity
             tvAverageVel.text = aVelocity
-            trackItem = TrackItem(
-                null,
-                getCurrentTime(),
-                TimeUtils.getDate(),
-                getString(R.string.distance_km, String.format("%.1f", it.distance / 1000)),
-                getString(R.string.average_velocity_km_h, getAverageSpeed(it.distance)),
-                ""
-            )
+            locationModel = it
             updatePolyline(it.geoPointsList)
         }
     }
@@ -149,6 +143,15 @@ class MainFragment : Fragment() {
         return getString(R.string.time, TimeUtils.getTime(System.currentTimeMillis() - startTime))
     }
 
+    private fun geoPointsToString(list: List<GeoPoint>): String {
+        val sb = StringBuilder()
+        list.forEach {
+            sb.append("${it.latitude},${it.longitude}/")
+        }
+        Log.d("MyLog", "Points: $sb")
+        return sb.toString()
+    }
+
     private fun startStopService() {
         if (!isServiceRunning) {
             startLocService()
@@ -158,14 +161,28 @@ class MainFragment : Fragment() {
             timer?.cancel()
             DialogManager.showSaveDialog(
                 requireContext(),
-                trackItem,
-                object : DialogManager.Listener{
-                override fun onClick() {
-                    showToast("Track Saved!")
-                }
-            })
+                getTrackItem(),
+                object : DialogManager.Listener {
+                    override fun onClick() {
+                        showToast("Track Saved!")
+                    }
+                })
         }
         isServiceRunning = !isServiceRunning
+    }
+
+    private fun getTrackItem(): TrackItem {
+        return TrackItem(
+            null,
+            getCurrentTime(),
+            TimeUtils.getDate(),
+            getString(R.string.distance_km, String.format("%.1f",
+                locationModel?.distance?.div(1000) ?: 0
+            )),
+            getString(R.string.average_velocity_km_h, getAverageSpeed(locationModel?.distance ?: 0.0f)),
+            geoPointsToString(locationModel?.geoPointsList ?: listOf())
+        )
+
     }
 
     private fun checkServiceState() {
@@ -322,18 +339,18 @@ class MainFragment : Fragment() {
             .registerReceiver(receiver, locFilter)
     }
 
-    private fun addPoint(list: List<GeoPoint>){
+    private fun addPoint(list: List<GeoPoint>) {
         pl?.addPoint(list[list.size - 1])
     }
 
-    private fun fillPolyLine(list: List<GeoPoint>){
+    private fun fillPolyLine(list: List<GeoPoint>) {
         list.forEach {
             pl?.addPoint(it)
         }
     }
 
-    private fun updatePolyline(list: List<GeoPoint>){
-        if (list.size > 1 && firstStart){
+    private fun updatePolyline(list: List<GeoPoint>) {
+        if (list.size > 1 && firstStart) {
             fillPolyLine(list)
             firstStart = false
         } else {
