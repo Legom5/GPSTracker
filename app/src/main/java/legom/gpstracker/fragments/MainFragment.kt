@@ -148,7 +148,6 @@ class MainFragment : Fragment() {
         list.forEach {
             sb.append("${it.latitude},${it.longitude}/")
         }
-        Log.d("MyLog", "Points: $sb")
         return sb.toString()
     }
 
