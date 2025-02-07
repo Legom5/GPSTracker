@@ -8,6 +8,7 @@ import android.view.LayoutInflater
 import android.widget.Toast
 import legom.gpstracker.R
 import legom.gpstracker.databinding.SaveDialogBinding
+import legom.gpstracker.db.TrackItem
 
 object DialogManager {
 
@@ -25,13 +26,16 @@ object DialogManager {
         dialog.show()
     }
 
-    fun showSaveDialog(context: Context, listener: Listener) {
+    fun showSaveDialog(context: Context,item: TrackItem?, listener: Listener) {
         val builder = AlertDialog.Builder(context)
         val binding = SaveDialogBinding
             .inflate(LayoutInflater.from(context), null, false)
         builder.setView(binding.root)
         val dialog = builder.create()
         binding.apply {
+            tvvTime.text = item?.time
+            tvSpeed.text = item?.velocity
+            tvvDistance.text = item?.distance
             bSave.setOnClickListener {
                 listener.onClick()
                 dialog.dismiss()

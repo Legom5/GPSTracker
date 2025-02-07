@@ -10,6 +10,7 @@ import android.location.LocationManager
 import android.os.Build
 import android.os.Bundle
 import android.provider.Settings
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.View.OnClickListener
@@ -21,9 +22,11 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
+import legom.gpstracker.MainApp
 import legom.gpstracker.MainViewModel
 import legom.gpstracker.R
 import legom.gpstracker.databinding.FragmentMainBinding
+import legom.gpstracker.db.TrackItem
 import legom.gpstracker.location.LocationModel
 import legom.gpstracker.location.LocationService
 import legom.gpstracker.utils.DialogManager
@@ -41,6 +44,8 @@ import java.util.TimerTask
 
 class MainFragment : Fragment() {
 
+    private var locationModel: LocationModel? = null
+
     private var pl: Polyline? = null
 
     private var isServiceRunning = false
@@ -57,7 +62,9 @@ class MainFragment : Fragment() {
 
     private lateinit var binding: FragmentMainBinding
 
-    private val model: MainViewModel by activityViewModels()
+    private val model: MainViewModel by activityViewModels{
+        MainViewModel.ViewModelFactory((requireContext().applicationContext as MainApp).database)
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -76,6 +83,9 @@ class MainFragment : Fragment() {
         updateTime()
         registerLocReceiver()
         locationUpdates()
+        model.tracks.observe(viewLifecycleOwner){
+            Log.d("MyLog", "List size: ${it.size}")
+        }
     }
 
     private fun setOnClicks() = with(binding) {
@@ -102,6 +112,7 @@ class MainFragment : Fragment() {
             tvDistance.text = distance
             tvVelocity.text = velocity
             tvAverageVel.text = aVelocity
+            locationModel = it
             updatePolyline(it.geoPointsList)
         }
     }
@@ -138,6 +149,14 @@ class MainFragment : Fragment() {
         return getString(R.string.time, TimeUtils.getTime(System.currentTimeMillis() - startTime))
     }
 
+    private fun geoPointsToString(list: List<GeoPoint>): String {
+        val sb = StringBuilder()
+        list.forEach {
+            sb.append("${it.latitude},${it.longitude}/")
+        }
+        return sb.toString()
+    }
+
     private fun startStopService() {
         if (!isServiceRunning) {
             startLocService()
@@ -145,13 +164,32 @@ class MainFragment : Fragment() {
             activity?.stopService(Intent(activity, LocationService::class.java))
             binding.fStartStop.setImageResource(R.drawable.ic_play)
             timer?.cancel()
-            DialogManager.showSaveDialog(requireContext(), object : DialogManager.Listener{
-                override fun onClick() {
-                    showToast("Track Saved!")
-                }
-            })
+            val track = getTrackItem()
+            DialogManager.showSaveDialog(
+                requireContext(),
+                track,
+                object : DialogManager.Listener {
+                    override fun onClick() {
+                        showToast("Track Saved!")
+                        model.insertTrack(track)
+                    }
+                })
         }
         isServiceRunning = !isServiceRunning
+    }
+
+    private fun getTrackItem(): TrackItem {
+        return TrackItem(
+            null,
+            getCurrentTime(),
+            TimeUtils.getDate(),
+            getString(R.string.distance_km, String.format("%.1f",
+                locationModel?.distance?.div(1000) ?: 0
+            )),
+            getString(R.string.average_velocity_km_h, getAverageSpeed(locationModel?.distance ?: 0.0f)),
+            geoPointsToString(locationModel?.geoPointsList ?: listOf())
+        )
+
     }
 
     private fun checkServiceState() {
@@ -308,18 +346,18 @@ class MainFragment : Fragment() {
             .registerReceiver(receiver, locFilter)
     }
 
-    private fun addPoint(list: List<GeoPoint>){
+    private fun addPoint(list: List<GeoPoint>) {
         pl?.addPoint(list[list.size - 1])
     }
 
-    private fun fillPolyLine(list: List<GeoPoint>){
+    private fun fillPolyLine(list: List<GeoPoint>) {
         list.forEach {
             pl?.addPoint(it)
         }
     }
 
-    private fun updatePolyline(list: List<GeoPoint>){
-        if (list.size > 1 && firstStart){
+    private fun updatePolyline(list: List<GeoPoint>) {
+        if (list.size > 1 && firstStart) {
             fillPolyLine(list)
             firstStart = false
         } else {
