@@ -22,6 +22,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
+import legom.gpstracker.MainApp
 import legom.gpstracker.MainViewModel
 import legom.gpstracker.R
 import legom.gpstracker.databinding.FragmentMainBinding
@@ -61,7 +62,9 @@ class MainFragment : Fragment() {
 
     private lateinit var binding: FragmentMainBinding
 
-    private val model: MainViewModel by activityViewModels()
+    private val model: MainViewModel by activityViewModels{
+        MainViewModel.ViewModelFactory((requireContext().applicationContext as MainApp).database)
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -80,6 +83,9 @@ class MainFragment : Fragment() {
         updateTime()
         registerLocReceiver()
         locationUpdates()
+        model.tracks.observe(viewLifecycleOwner){
+            Log.d("MyLog", "List size: ${it.size}")
+        }
     }
 
     private fun setOnClicks() = with(binding) {
@@ -158,12 +164,14 @@ class MainFragment : Fragment() {
             activity?.stopService(Intent(activity, LocationService::class.java))
             binding.fStartStop.setImageResource(R.drawable.ic_play)
             timer?.cancel()
+            val track = getTrackItem()
             DialogManager.showSaveDialog(
                 requireContext(),
-                getTrackItem(),
+                track,
                 object : DialogManager.Listener {
                     override fun onClick() {
                         showToast("Track Saved!")
+                        model.insertTrack(track)
                     }
                 })
         }
