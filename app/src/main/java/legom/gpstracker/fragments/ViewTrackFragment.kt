@@ -1,6 +1,7 @@
 package legom.gpstracker.fragments
 
 import android.content.Context
+import android.graphics.Color
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -9,6 +10,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.content.res.AppCompatResources.getDrawable
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import androidx.preference.PreferenceManager
 import legom.gpstracker.MainApp
 import legom.gpstracker.MainViewModel
 import legom.gpstracker.R
@@ -75,6 +77,10 @@ class ViewTrackFragment : Fragment() {
 
     private fun getPolyLine(geoPoints: String): Polyline{
         val polyLine = Polyline()
+        polyLine.outlinePaint.color = Color.parseColor(
+            PreferenceManager.getDefaultSharedPreferences(requireContext())
+                .getString("color_key", "#DE0000")
+        )
         val list = geoPoints.split("/")
         list.forEach {
             if (it.isEmpty()) return@forEach

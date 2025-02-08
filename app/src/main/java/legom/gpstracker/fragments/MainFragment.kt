@@ -10,7 +10,6 @@ import android.location.LocationManager
 import android.os.Build
 import android.os.Bundle
 import android.provider.Settings
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.View.OnClickListener
@@ -22,6 +21,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
+import androidx.preference.PreferenceManager
 import legom.gpstracker.MainApp
 import legom.gpstracker.MainViewModel
 import legom.gpstracker.R
@@ -224,7 +224,10 @@ class MainFragment : Fragment() {
 
     private fun initOSM() = with(binding) {
         pl = Polyline()
-        pl?.outlinePaint?.color = Color.RED
+        pl?.outlinePaint?.color = Color.parseColor(
+            PreferenceManager.getDefaultSharedPreferences(requireContext())
+                .getString("color_key", "#DE0000")
+        )
         map.controller.setZoom(20.0)
         val mLocProvide = GpsMyLocationProvider(activity)
         val mLocOverlay = MyLocationNewOverlay(mLocProvide, map)
