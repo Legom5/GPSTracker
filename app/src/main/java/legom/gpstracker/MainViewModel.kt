@@ -14,6 +14,7 @@ import legom.gpstracker.location.LocationModel
 class MainViewModel(db: MainDb): ViewModel() {
     private val dao = db.getDao()
     val locationUpdates = MutableLiveData<LocationModel>()
+    val currentTrack = MutableLiveData<TrackItem>()
     val timeData = MutableLiveData<String>()
     val tracks = dao.getAllTracks().asLiveData()
 
