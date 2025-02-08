@@ -12,6 +12,7 @@ import legom.gpstracker.MainViewModel
 import legom.gpstracker.databinding.TracksBinding
 import legom.gpstracker.db.TrackAdapter
 import legom.gpstracker.db.TrackItem
+import legom.gpstracker.utils.openFragment
 
 class TracksFragment : Fragment(), TrackAdapter.Listener {
 
@@ -19,7 +20,7 @@ class TracksFragment : Fragment(), TrackAdapter.Listener {
 
     private lateinit var adapter: TrackAdapter
 
-    private val model: MainViewModel by activityViewModels{
+    private val model: MainViewModel by activityViewModels {
         MainViewModel.ViewModelFactory((requireContext().applicationContext as MainApp).database)
     }
 
@@ -37,21 +38,25 @@ class TracksFragment : Fragment(), TrackAdapter.Listener {
         getTracks()
     }
 
-    private fun getTracks(){
-        model.tracks.observe(viewLifecycleOwner){
+    private fun getTracks() {
+        model.tracks.observe(viewLifecycleOwner) {
             adapter.submitList(it)
             binding.tvEmpty.visibility = if (it.isEmpty()) View.VISIBLE else View.GONE
         }
     }
 
-    private fun initRcView() = with(binding){
+    private fun initRcView() = with(binding) {
         adapter = TrackAdapter(this@TracksFragment)
         rcView.layoutManager = LinearLayoutManager(requireContext())
         rcView.adapter = adapter
     }
 
-    override fun onClick(track: TrackItem) {
-        model.deleteTrack(track)
+    override fun onClick(track: TrackItem, type: TrackAdapter.ClickType) {
+        when (type) {
+            TrackAdapter.ClickType.DELETE -> model.deleteTrack(track)
+            TrackAdapter.ClickType.OPEN -> openFragment(ViewTrackFragment.newInstance())
+        }
+
     }
 
     companion object {
