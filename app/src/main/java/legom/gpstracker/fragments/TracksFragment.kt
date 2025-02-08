@@ -11,8 +11,9 @@ import legom.gpstracker.MainApp
 import legom.gpstracker.MainViewModel
 import legom.gpstracker.databinding.TracksBinding
 import legom.gpstracker.db.TrackAdapter
+import legom.gpstracker.db.TrackItem
 
-class TracksFragment : Fragment() {
+class TracksFragment : Fragment(), TrackAdapter.Listener {
 
     private lateinit var binding: TracksBinding
 
@@ -44,12 +45,14 @@ class TracksFragment : Fragment() {
     }
 
     private fun initRcView() = with(binding){
-        adapter = TrackAdapter()
+        adapter = TrackAdapter(this@TracksFragment)
         rcView.layoutManager = LinearLayoutManager(requireContext())
         rcView.adapter = adapter
     }
 
-
+    override fun onClick(track: TrackItem) {
+        model.deleteTrack(track)
+    }
 
     companion object {
         @JvmStatic
