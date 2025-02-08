@@ -83,9 +83,7 @@ class MainFragment : Fragment() {
         updateTime()
         registerLocReceiver()
         locationUpdates()
-        model.tracks.observe(viewLifecycleOwner){
-            Log.d("MyLog", "List size: ${it.size}")
-        }
+
     }
 
     private fun setOnClicks() = with(binding) {
@@ -183,7 +181,7 @@ class MainFragment : Fragment() {
             null,
             getCurrentTime(),
             TimeUtils.getDate(),
-            getString(R.string.distance_km, String.format("%.1f",
+            getString(R.string.distance_km_byRC, String.format("%.1f",
                 locationModel?.distance?.div(1000) ?: 0
             )),
             getString(R.string.average_velocity_km_h, getAverageSpeed(locationModel?.distance ?: 0.0f)),
