@@ -11,10 +11,10 @@ import android.location.Location
 import android.os.Build
 import android.os.IBinder
 import android.os.Looper
-import android.util.Log
 import androidx.core.app.ActivityCompat
 import androidx.core.app.NotificationCompat
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
+import androidx.preference.PreferenceManager
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationCallback
 import com.google.android.gms.location.LocationRequest
@@ -23,7 +23,6 @@ import com.google.android.gms.location.LocationServices
 import com.google.android.gms.location.Priority.PRIORITY_HIGH_ACCURACY
 import legom.gpstracker.MainActivity
 import legom.gpstracker.R
-import legom.gpstracker.utils.showToast
 import org.osmdroid.util.GeoPoint
 
 class LocationService : Service() {
@@ -64,9 +63,10 @@ class LocationService : Service() {
             super.onLocationResult(lResult)
             val currentLocation = lResult.lastLocation
             if (lastLocation != null && currentLocation != null) {
-//                if (currentLocation.speed > 0.2) {
+                if (currentLocation.speed > 0.4) {
                     distance += lastLocation?.distanceTo(currentLocation) ?: 0.0f
                     geoPointsList.add(GeoPoint(currentLocation.latitude, currentLocation.longitude))
+                }
                     val locModel = LocationModel(
                         currentLocation.speed,
                         distance,
@@ -76,8 +76,6 @@ class LocationService : Service() {
 //                }
             }
             lastLocation = currentLocation
-
-            Log.d("MyLog", "Location: $distance")
         }
     }
 
@@ -116,9 +114,12 @@ class LocationService : Service() {
     }
 
     private fun initLocation() {
+        val updateInterval = PreferenceManager.getDefaultSharedPreferences(
+            this
+        ).getString("update_time_key", "3000")?.toLong() ?: 3000L
         locRequest = LocationRequest.create()
-        locRequest.interval = 5000
-        locRequest.fastestInterval = 5000
+        locRequest.interval = updateInterval
+        locRequest.fastestInterval = updateInterval
         locRequest.priority = PRIORITY_HIGH_ACCURACY
         locProvider = LocationServices.getFusedLocationProviderClient(baseContext)
     }

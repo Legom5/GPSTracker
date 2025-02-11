@@ -64,7 +64,7 @@ class MainFragment : Fragment() {
 
     private lateinit var binding: FragmentMainBinding
 
-    private val model: MainViewModel by activityViewModels{
+    private val model: MainViewModel by activityViewModels {
         MainViewModel.ViewModelFactory((requireContext().applicationContext as MainApp).database)
     }
 
@@ -100,6 +100,7 @@ class MainFragment : Fragment() {
                 R.id.fStartStop -> {
                     startStopService()
                 }
+
                 R.id.fCenter -> {
                     centerLocation()
                 }
@@ -107,7 +108,7 @@ class MainFragment : Fragment() {
         }
     }
 
-    private fun centerLocation(){
+    private fun centerLocation() {
         binding.map.controller.animateTo(mLocOverlay.myLocation)
         mLocOverlay.enableMyLocation()
     }
@@ -192,10 +193,16 @@ class MainFragment : Fragment() {
             null,
             getCurrentTime(),
             TimeUtils.getDate(),
-            getString(R.string.distance_km_byRC, String.format("%.1f",
-                locationModel?.distance?.div(1000) ?: 0
-            )),
-            getString(R.string.average_velocity_km_h, getAverageSpeed(locationModel?.distance ?: 0.0f)),
+            getString(
+                R.string.distance_km_byRC, String.format(
+                    "%.1f",
+                    locationModel?.distance?.div(1000) ?: 0
+                )
+            ),
+            getString(
+                R.string.average_velocity_km_h,
+                getAverageSpeed(locationModel?.distance ?: 0.0f)
+            ),
             geoPointsToString(locationModel?.geoPointsList ?: listOf())
         )
 
@@ -223,6 +230,7 @@ class MainFragment : Fragment() {
     override fun onResume() {
         super.onResume()
         checkLocPermission()
+        firstStart = false
     }
 
     private fun settingsOsm() {
@@ -246,8 +254,8 @@ class MainFragment : Fragment() {
         mLocOverlay.enableFollowLocation()
         mLocOverlay.runOnFirstFix {
             map.overlays.clear()
-            map.overlays.add(mLocOverlay)
             map.overlays.add(pl)
+            map.overlays.add(mLocOverlay)
         }
     }
 
@@ -359,7 +367,7 @@ class MainFragment : Fragment() {
     }
 
     private fun addPoint(list: List<GeoPoint>) {
-        pl?.addPoint(list[list.size - 1])
+        if (list.isNotEmpty()) pl?.addPoint(list[list.size - 1])
     }
 
     private fun fillPolyLine(list: List<GeoPoint>) {
