@@ -23,9 +23,11 @@ import org.osmdroid.views.overlay.Polyline
 
 class ViewTrackFragment : Fragment() {
 
+    private var startPoint: GeoPoint? = null
+
     private lateinit var binding: ViewTrackBinding
 
-    private val model: MainViewModel by activityViewModels{
+    private val model: MainViewModel by activityViewModels {
         MainViewModel.ViewModelFactory((requireContext().applicationContext as MainApp).database)
     }
 
@@ -41,10 +43,13 @@ class ViewTrackFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         getTrack()
+        binding.fCenter.setOnClickListener {
+            if (startPoint != null) binding.map.controller.animateTo(startPoint)
+        }
     }
 
-    private fun getTrack() = with(binding){
-        model.currentTrack.observe(viewLifecycleOwner){
+    private fun getTrack() = with(binding) {
+        model.currentTrack.observe(viewLifecycleOwner) {
             val distance = getString(R.string.distance_in_view_track, it.distance)
             tvDate.text = it.date
             tvTime.text = it.time
@@ -54,15 +59,16 @@ class ViewTrackFragment : Fragment() {
             map.overlays.add(polyLine)
             setMarkers(polyLine.actualPoints)
             goToStartPosition(polyLine.actualPoints[0])
+            startPoint = polyLine.actualPoints[0]
         }
     }
 
-    private fun goToStartPosition(startPosition: GeoPoint){
+    private fun goToStartPosition(startPosition: GeoPoint) {
         binding.map.controller.zoomTo(15.0)
         binding.map.controller.animateTo(startPosition)
     }
 
-    private fun setMarkers(list: List<GeoPoint>) = with(binding){
+    private fun setMarkers(list: List<GeoPoint>) = with(binding) {
         val startMarker = Marker(map)
         val finishMarker = Marker(map)
         startMarker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM)
@@ -75,7 +81,7 @@ class ViewTrackFragment : Fragment() {
         map.overlays.add(finishMarker)
     }
 
-    private fun getPolyLine(geoPoints: String): Polyline{
+    private fun getPolyLine(geoPoints: String): Polyline {
         val polyLine = Polyline()
         polyLine.outlinePaint.color = Color.parseColor(
             PreferenceManager.getDefaultSharedPreferences(requireContext())

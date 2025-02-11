@@ -55,6 +55,8 @@ class MainFragment : Fragment() {
     private var timer: Timer? = null
     private var startTime = 0L
 
+    private lateinit var mLocOverlay: MyLocationNewOverlay
+
 
     private val LOCATION_PERMISSION_REQUEST = 11
 
@@ -89,6 +91,7 @@ class MainFragment : Fragment() {
     private fun setOnClicks() = with(binding) {
         val listener = onClicks()
         fStartStop.setOnClickListener(listener)
+        fCenter.setOnClickListener(listener)
     }
 
     private fun onClicks(): OnClickListener {
@@ -97,8 +100,16 @@ class MainFragment : Fragment() {
                 R.id.fStartStop -> {
                     startStopService()
                 }
+                R.id.fCenter -> {
+                    centerLocation()
+                }
             }
         }
+    }
+
+    private fun centerLocation(){
+        binding.map.controller.animateTo(mLocOverlay.myLocation)
+        mLocOverlay.enableMyLocation()
     }
 
     private fun locationUpdates() = with(binding) {
@@ -230,7 +241,7 @@ class MainFragment : Fragment() {
         )
         map.controller.setZoom(20.0)
         val mLocProvide = GpsMyLocationProvider(activity)
-        val mLocOverlay = MyLocationNewOverlay(mLocProvide, map)
+        mLocOverlay = MyLocationNewOverlay(mLocProvide, map)
         mLocOverlay.enableMyLocation()
         mLocOverlay.enableFollowLocation()
         mLocOverlay.runOnFirstFix {
