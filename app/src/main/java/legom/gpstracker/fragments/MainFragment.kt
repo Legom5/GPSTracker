@@ -181,7 +181,7 @@ class MainFragment : Fragment() {
                 object : DialogManager.Listener {
                     override fun onClick() {
                         showToast("Track Saved!")
-                        model.insertTrack(track)
+                        if (track.geoPoints.isNotEmpty()) model.insertTrack(track)
                     }
                 })
         }
@@ -196,7 +196,7 @@ class MainFragment : Fragment() {
             getString(
                 R.string.distance_km_byRC, String.format(
                     "%.1f",
-                    locationModel?.distance?.div(1000) ?: 0
+                    locationModel?.distance?.div(1000) ?: 0.0f
                 )
             ),
             getString(
