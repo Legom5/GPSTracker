@@ -180,8 +180,12 @@ class MainFragment : Fragment() {
                 track,
                 object : DialogManager.Listener {
                     override fun onClick() {
-                        showToast("Track Saved!")
-                        if (track.geoPoints.isNotEmpty()) model.insertTrack(track)
+                        if (track.geoPoints.isNotEmpty()){
+                            model.insertTrack(track)
+                            showToast(getString(R.string.track_saved))
+                        } else {
+                            showToast(getString(R.string.track_not_saved_the_distance_is_not_covered))
+                        }
                     }
                 })
         }

@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">GPSTracker</string>
+    <string name="app_name" translatable="false">GPS Tracker</string>
     <string name="yes">Yes</string>
     <string name="no">No</string>
     <string name="home">Home</string>
@@ -25,4 +25,12 @@
     <string name="km">%1$s km</string>
     <string name="empty">Empty</string>
     <string name="distance_in_view_track">Distance: %1$s</string>
+    <string name="track_not_saved_the_distance_is_not_covered">Track not saved, the distance is not covered</string>
+    <string name="track_saved">Track Saved</string>
+    <string name="blue">Blue</string>
+    <string name="red">Red</string>
+    <string name="black">Black</string>
+    <string name="sec_3">3 sec.</string>
+    <string name="sec_5">5 sec.</string>
+    <string name="sec_10">10 sec.</string>
 </resources>

@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="yes">Да</string>
+    <string name="no">Нет</string>
+    <string name="home">Главная</string>
+    <string name="tracks">Маршруты</string>
+    <string name="settings">Настройки</string>
+    <string name="location">Местоположение</string>
+    <string name="update_time">Время обновления</string>
+    <string name="update_time_summary">Время обновления местоположения</string>
+    <string name="track_color">Цвет маршрута</string>
+    <string name="track_color_summary">Выберите цвет</string>
+    <string name="location_disabled">Местоположение отключено</string>
+    <string name="location_dialog_message">Включить GPS?</string>
+    <string name="time">Время: %1$s</string>
+    <string name="distance_m">Дистанция: %1$s м</string>
+    <string name="distance_km">Дистанция: %1$s км</string>
+    <string name="distance_km_byRC">%1$s км</string>
+    <string name="velocity_km_h">Скорость: %1$s км/ч</string>
+    <string name="average_velocity_km_h">Средняя скорость: %1$s км/ч</string>
+    <string name="save_this_track">Сохранить маршрут?</string>
+    <string name="save">Сохранить</string>
+    <string name="cancel">Отмена</string>
+    <string name="km_h">%1$s км/ч</string>
+    <string name="km">%1$s км</string>
+    <string name="empty">Пусто</string>
+    <string name="distance_in_view_track">Дистанция: %1$s</string>
+    <string name="track_not_saved_the_distance_is_not_covered">Маршрут не сохранен, дистанция не пройдена</string>
+    <string name="track_saved">Маршрут сохранен</string>
+    <string name="blue">Синий</string>
+    <string name="red">Красный</string>
+    <string name="black">Черный</string>
+    <string name="sec_3">3 сек.</string>
+    <string name="sec_5">5 сек.</string>
+    <string name="sec_10">10 сек.</string>
+</resources>
