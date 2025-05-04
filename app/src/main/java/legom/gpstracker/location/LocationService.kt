@@ -73,7 +73,6 @@ class LocationService : Service() {
                         geoPointsList
                     )
                     sendLocData(locModel)
-//                }
             }
             lastLocation = currentLocation
         }
@@ -107,7 +106,7 @@ class LocationService : Service() {
         val notification = NotificationCompat.Builder(
             this,
             CHANEL_ID
-        ).setSmallIcon(R.mipmap.ic_launcher).setContentTitle("Tracker Running!")
+        ).setSmallIcon(R.drawable.ic_gps_logo_round).setContentTitle(getString(R.string.tracker_running))
             .setContentIntent(pIntent)
             .build()
         startForeground(99, notification)

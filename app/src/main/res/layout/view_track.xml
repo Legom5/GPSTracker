@@ -18,6 +18,33 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/fab_zoom_in"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="184dp"
+        android:src="@drawable/ic_add"
+        app:backgroundTint="@color/white"
+        app:layout_anchorGravity="bottom|right|end"
+        app:layout_constraintEnd_toEndOf="@+id/fCenter"
+        app:layout_constraintStart_toStartOf="@+id/fCenter"
+        app:layout_constraintTop_toBottomOf="@+id/fCenter"
+        tools:ignore="MissingConstraints" />
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/fab_zoom_out"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:src="@drawable/ic_remove"
+        app:backgroundTint="@color/white"
+        app:layout_anchor="@id/fab_zoom_in"
+        app:layout_anchorGravity="top|right|end"
+        app:layout_constraintEnd_toEndOf="@+id/fab_zoom_in"
+        app:layout_constraintStart_toStartOf="@+id/fab_zoom_in"
+        app:layout_constraintTop_toBottomOf="@+id/fab_zoom_in"
+        tools:ignore="MissingConstraints" />
+
     <org.osmdroid.views.MapView
         android:id="@+id/map"
         android:layout_width="0dp"
@@ -82,6 +109,12 @@
         android:textSize="24sp"
         app:layout_constraintStart_toStartOf="@+id/tvAverageVel"
         app:layout_constraintTop_toBottomOf="@+id/tvAverageVel" />
+
+    <com.yandex.mobile.ads.banner.BannerAdView
+        android:id="@+id/ad_container_view"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintBottom_toBottomOf="parent" />
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

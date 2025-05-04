@@ -44,6 +44,9 @@ android {
 
 dependencies {
 
+    //Yandex sdk
+    implementation ("com.yandex.android:mobileads:7.12.1")
+
     implementation(libs.androidx.room.ktx)
     ksp(libs.androidx.room.compiler)
 

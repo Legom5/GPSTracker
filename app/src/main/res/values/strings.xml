@@ -13,11 +13,15 @@
     <string name="location_disabled">Location disabled</string>
     <string name="location_dialog_message">Do you want enable GPS?</string>
     <string name="time">Time: %1$s</string>
+    <string name="time_empty">Time:</string>
     <string name="distance_m">Distance: %1$s m</string>
+    <string name="distance_m_empty">Distance:</string>
     <string name="distance_km">Distance: %1$s km</string>
     <string name="distance_km_byRC">%1$s km</string>
     <string name="velocity_km_h">Velocity: %1$s km/h</string>
+    <string name="velocity_km_h_empty">Velocity:</string>
     <string name="average_velocity_km_h">Average velocity: %1$s km/h</string>
+    <string name="average_velocity_km_h_empty">Average velocity:</string>
     <string name="save_this_track">Save this track?</string>
     <string name="save">Save</string>
     <string name="cancel">Cancel</string>
@@ -33,4 +37,5 @@
     <string name="sec_3">3 sec.</string>
     <string name="sec_5">5 sec.</string>
     <string name="sec_10">10 sec.</string>
+    <string name="tracker_running">Tracker Running</string>
 </resources>

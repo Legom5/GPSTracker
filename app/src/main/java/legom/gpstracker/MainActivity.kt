@@ -4,9 +4,18 @@ import android.Manifest
 import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
+import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import com.yandex.mobile.ads.common.AdError
+import com.yandex.mobile.ads.common.AdRequestConfiguration
+import com.yandex.mobile.ads.common.AdRequestError
+import com.yandex.mobile.ads.common.ImpressionData
+import com.yandex.mobile.ads.interstitial.InterstitialAd
+import com.yandex.mobile.ads.interstitial.InterstitialAdEventListener
+import com.yandex.mobile.ads.interstitial.InterstitialAdLoadListener
+import com.yandex.mobile.ads.interstitial.InterstitialAdLoader
 import legom.gpstracker.databinding.ActivityMainBinding
 import legom.gpstracker.fragments.MainFragment
 import legom.gpstracker.fragments.SettingsFragment
@@ -14,6 +23,7 @@ import legom.gpstracker.fragments.TracksFragment
 import legom.gpstracker.utils.openFragment
 
 class MainActivity : AppCompatActivity() {
+
 
     private lateinit var binding: ActivityMainBinding
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -23,6 +33,9 @@ class MainActivity : AppCompatActivity() {
         setContentView(binding.root)
         onButtonNavClicks()
         openFragment(MainFragment.newInstance(), "main")
+
+
+
     }
 
 
@@ -49,4 +62,8 @@ class MainActivity : AppCompatActivity() {
                 101)
         }
     }
+
+
+
+
 }

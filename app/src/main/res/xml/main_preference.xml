@@ -23,4 +23,5 @@
             app:summary="@string/track_color_summary" />
     </PreferenceCategory>
 
+
 </androidx.preference.PreferenceScreen>

@@ -1,6 +1,7 @@
 package legom.gpstracker.utils
 
 import android.content.pm.PackageManager
+import android.util.Log
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
@@ -20,11 +21,9 @@ fun AppCompatActivity.openFragment(f: Fragment, name: String) {
             return
         }
     }
-    supportFragmentManager.popBackStack("main", 0)
     supportFragmentManager
         .beginTransaction()
         .setCustomAnimations(android.R.anim.fade_in, android.R.anim.fade_out)
-        .addToBackStack(name)
         .replace(R.id.placeHolder, f).commit()
 
 }

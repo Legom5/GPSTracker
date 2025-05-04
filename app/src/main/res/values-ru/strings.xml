@@ -13,10 +13,13 @@
     <string name="location_disabled">Местоположение отключено</string>
     <string name="location_dialog_message">Включить GPS?</string>
     <string name="time">Время: %1$s</string>
+    <string name="time_empty">Время:</string>
     <string name="distance_m">Дистанция: %1$s м</string>
     <string name="distance_km">Дистанция: %1$s км</string>
     <string name="distance_km_byRC">%1$s км</string>
+    <string name="distance_m_empty">Дистанция:</string>
     <string name="velocity_km_h">Скорость: %1$s км/ч</string>
+    <string name="velocity_km_h_empty">Скорость:</string>
     <string name="average_velocity_km_h">Средняя скорость: %1$s км/ч</string>
     <string name="save_this_track">Сохранить маршрут?</string>
     <string name="save">Сохранить</string>
@@ -33,4 +36,6 @@
     <string name="sec_3">3 сек.</string>
     <string name="sec_5">5 сек.</string>
     <string name="sec_10">10 сек.</string>
+    <string name="average_velocity_km_h_empty">Средняя скорость:</string>
+    <string name="tracker_running">Маршрут записывается</string>
 </resources>
