@@ -85,7 +85,7 @@ class ViewTrackFragment : Fragment() {
     private fun loadBannerAd(adSize: BannerAdSize): BannerAdView {
         return binding.adContainerView.apply {
             setAdSize(adSize)
-            setAdUnitId("demo-banner-yandex")
+            setAdUnitId("R-M-3649610-1")
             setBannerAdEventListener(object : BannerAdEventListener {
                 override fun onAdLoaded() {
                     // If this callback occurs after the activity is destroyed, you

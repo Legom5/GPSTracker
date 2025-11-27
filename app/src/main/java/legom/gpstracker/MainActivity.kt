@@ -4,6 +4,8 @@ import android.Manifest
 import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
@@ -17,13 +19,17 @@ import com.yandex.mobile.ads.interstitial.InterstitialAdEventListener
 import com.yandex.mobile.ads.interstitial.InterstitialAdLoadListener
 import com.yandex.mobile.ads.interstitial.InterstitialAdLoader
 import legom.gpstracker.databinding.ActivityMainBinding
+import legom.gpstracker.fragments.CustomRatingDialogFragment
 import legom.gpstracker.fragments.MainFragment
+import legom.gpstracker.fragments.RatingDialogFragment
 import legom.gpstracker.fragments.SettingsFragment
 import legom.gpstracker.fragments.TracksFragment
+import legom.gpstracker.utils.AppRatingManager
 import legom.gpstracker.utils.openFragment
 
 class MainActivity : AppCompatActivity() {
 
+    private lateinit var ratingManager: AppRatingManager
 
     private lateinit var binding: ActivityMainBinding
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -34,8 +40,27 @@ class MainActivity : AppCompatActivity() {
         onButtonNavClicks()
         openFragment(MainFragment.newInstance(), "main")
 
+        ratingManager = AppRatingManager(this)
+        ratingManager.incrementLaunchCount()
+
+        Handler(Looper.getMainLooper()).postDelayed(
+            {
+                checkAndShowRatingDialog()
+            }, 2000
+        )
 
 
+    }
+
+    private fun checkAndShowRatingDialog() {
+        if (ratingManager.shouldShowRating()) {
+            showRatingDialog()
+            ratingManager.setRatingPromptShown()
+        }
+    }
+
+    private fun showRatingDialog() {
+        CustomRatingDialogFragment().show(supportFragmentManager, "rating_dialog")
     }
 
 
@@ -50,7 +75,7 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private fun checkNotificationPermission(){
+    private fun checkNotificationPermission() {
         if (Build.VERSION.SDK_INT >= 33 && ContextCompat.checkSelfPermission(
                 this,
                 Manifest.permission.ACCESS_NOTIFICATION_POLICY
@@ -59,11 +84,10 @@ class MainActivity : AppCompatActivity() {
             ActivityCompat.requestPermissions(
                 this,
                 arrayOf(Manifest.permission.POST_NOTIFICATIONS),
-                101)
+                101
+            )
         }
     }
-
-
 
 
 }

@@ -14,10 +14,10 @@
     <string name="location_dialog_message">Включить GPS?</string>
     <string name="time">Время: %1$s</string>
     <string name="time_empty">Время:</string>
-    <string name="distance_m">Дистанция: %1$s м</string>
-    <string name="distance_km">Дистанция: %1$s км</string>
+    <string name="distance_m">Расстояние: %1$s м</string>
+    <string name="distance_km">Расстояние: %1$s км</string>
     <string name="distance_km_byRC">%1$s км</string>
-    <string name="distance_m_empty">Дистанция:</string>
+    <string name="distance_m_empty">Расстояние:</string>
     <string name="velocity_km_h">Скорость: %1$s км/ч</string>
     <string name="velocity_km_h_empty">Скорость:</string>
     <string name="average_velocity_km_h">Средняя скорость: %1$s км/ч</string>
@@ -27,8 +27,8 @@
     <string name="km_h">%1$s км/ч</string>
     <string name="km">%1$s км</string>
     <string name="empty">Пусто</string>
-    <string name="distance_in_view_track">Дистанция: %1$s</string>
-    <string name="track_not_saved_the_distance_is_not_covered">Маршрут не сохранен, дистанция не пройдена</string>
+    <string name="distance_in_view_track">Расстояние: %1$s</string>
+    <string name="track_not_saved_the_distance_is_not_covered">Маршрут не сохранен, расстояние не пройдено</string>
     <string name="track_saved">Маршрут сохранен</string>
     <string name="blue">Синий</string>
     <string name="red">Красный</string>

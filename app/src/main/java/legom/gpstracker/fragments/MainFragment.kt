@@ -151,7 +151,7 @@ class MainFragment : Fragment() {
     private fun loadBannerAd(adSize: BannerAdSize): BannerAdView {
         return binding.adContainerView.apply {
             setAdSize(adSize)
-            setAdUnitId("demo-banner-yandex")
+            setAdUnitId("R-M-3649610-1")
             setBannerAdEventListener(object : BannerAdEventListener {
                 override fun onAdLoaded() {
                     // If this callback occurs after the activity is destroyed, you
@@ -190,7 +190,7 @@ class MainFragment : Fragment() {
     }
 
     private fun loadInterstitialAd() {
-        val adRequestConfiguration = AdRequestConfiguration.Builder("demo-interstitial-yandex").build()
+        val adRequestConfiguration = AdRequestConfiguration.Builder("R-M-3649610-2").build()
         interstitialAdLoader?.loadAd(adRequestConfiguration)
     }
 
@@ -496,8 +496,6 @@ class MainFragment : Fragment() {
                     }
                 }
             )
-        } else {
-            showToast("GPS включен")
         }
     }
 
