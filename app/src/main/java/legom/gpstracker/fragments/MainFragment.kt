@@ -5,15 +5,19 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
+import android.content.pm.PackageManager
 import android.graphics.Color
 import android.location.LocationManager
 import android.os.Build
 import android.os.Bundle
 import android.provider.Settings
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.View.OnClickListener
 import android.view.ViewGroup
+import android.view.ViewTreeObserver
+import android.widget.ZoomButtonsController
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.RequiresApi
@@ -22,6 +26,19 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import androidx.preference.PreferenceManager
+import com.yandex.mobile.ads.banner.BannerAdEventListener
+import com.yandex.mobile.ads.banner.BannerAdSize
+import com.yandex.mobile.ads.banner.BannerAdView
+import com.yandex.mobile.ads.common.AdError
+import com.yandex.mobile.ads.common.AdRequest
+import com.yandex.mobile.ads.common.AdRequestConfiguration
+import com.yandex.mobile.ads.common.AdRequestError
+import com.yandex.mobile.ads.common.ImpressionData
+import com.yandex.mobile.ads.interstitial.InterstitialAd
+import com.yandex.mobile.ads.interstitial.InterstitialAdEventListener
+import com.yandex.mobile.ads.interstitial.InterstitialAdLoadListener
+import com.yandex.mobile.ads.interstitial.InterstitialAdLoader
+import legom.gpstracker.MainActivity
 import legom.gpstracker.MainApp
 import legom.gpstracker.MainViewModel
 import legom.gpstracker.R
@@ -36,13 +53,33 @@ import legom.gpstracker.utils.showToast
 import org.osmdroid.config.Configuration
 import org.osmdroid.library.BuildConfig
 import org.osmdroid.util.GeoPoint
+import org.osmdroid.views.MapView
 import org.osmdroid.views.overlay.Polyline
 import org.osmdroid.views.overlay.mylocation.GpsMyLocationProvider
 import org.osmdroid.views.overlay.mylocation.MyLocationNewOverlay
 import java.util.Timer
 import java.util.TimerTask
+import kotlin.math.roundToInt
 
 class MainFragment : Fragment() {
+
+    private var interstitialAd: InterstitialAd? = null
+    private var interstitialAdLoader: InterstitialAdLoader? = null
+
+    private var bannerAd: BannerAdView? = null
+
+    private val adSize: BannerAdSize
+        get() {
+            // Calculate the width of the ad, taking into account the padding in the ad container.
+            var adWidthPixels = binding.adContainerView.width
+            if (adWidthPixels == 0) {
+                // If the ad hasn't been laid out, default to the full screen width
+                adWidthPixels = resources.displayMetrics.widthPixels
+            }
+            val adWidth = (adWidthPixels / resources.displayMetrics.density).roundToInt()
+
+            return BannerAdSize.fixedSize(requireActivity(), adWidth, 50)
+        }
 
     private var locationModel: LocationModel? = null
 
@@ -55,6 +92,8 @@ class MainFragment : Fragment() {
     private var timer: Timer? = null
     private var startTime = 0L
 
+    private lateinit var mLocOverlay: MyLocationNewOverlay
+
 
     private val LOCATION_PERMISSION_REQUEST = 11
 
@@ -62,7 +101,7 @@ class MainFragment : Fragment() {
 
     private lateinit var binding: FragmentMainBinding
 
-    private val model: MainViewModel by activityViewModels{
+    private val model: MainViewModel by activityViewModels {
         MainViewModel.ViewModelFactory((requireContext().applicationContext as MainApp).database)
     }
 
@@ -83,12 +122,117 @@ class MainFragment : Fragment() {
         updateTime()
         registerLocReceiver()
         locationUpdates()
+        Log.d("MyLog", "onViewCreated")
 
+        binding.adContainerView.viewTreeObserver.addOnGlobalLayoutListener(object :
+            ViewTreeObserver.OnGlobalLayoutListener {
+            override fun onGlobalLayout() {
+                binding.adContainerView.viewTreeObserver.removeOnGlobalLayoutListener(this);
+                bannerAd = loadBannerAd(adSize)
+            }
+        })
+
+        interstitialAdLoader = InterstitialAdLoader(requireActivity()).apply {
+            setAdLoadListener(object : InterstitialAdLoadListener {
+                override fun onAdLoaded(ad: InterstitialAd) {
+                    interstitialAd = ad
+                    // The ad was loaded successfully. Now you can show loaded ad.
+                }
+
+                override fun onAdFailedToLoad(adRequestError: AdRequestError) {
+                    // Ad failed to load with AdRequestError.
+                    // Attempting to load a new ad from the onAdFailedToLoad() method is strongly discouraged.
+                }
+            })
+        }
+        loadInterstitialAd()
+    }
+
+    private fun loadBannerAd(adSize: BannerAdSize): BannerAdView {
+        return binding.adContainerView.apply {
+            setAdSize(adSize)
+            setAdUnitId("R-M-3649610-1")
+            setBannerAdEventListener(object : BannerAdEventListener {
+                override fun onAdLoaded() {
+                    // If this callback occurs after the activity is destroyed, you
+                    // must call destroy and return or you may get a memory leak.
+                    // Note `isDestroyed` is a method on Activity.
+
+                }
+
+                override fun onAdFailedToLoad(adRequestError: AdRequestError) {
+                    // Ad failed to load with AdRequestError.
+                    // Attempting to load a new ad from the onAdFailedToLoad() method is strongly discouraged.
+                }
+
+                override fun onAdClicked() {
+                    // Called when a click is recorded for an ad.
+                }
+
+                override fun onLeftApplication() {
+                    // Called when user is about to leave application (e.g., to go to the browser), as a result of clicking on the ad.
+                }
+
+                override fun onReturnedToApplication() {
+                    // Called when user returned to application after click.
+                }
+
+                override fun onImpression(impressionData: ImpressionData?) {
+                    // Called when an impression is recorded for an ad.
+                }
+            })
+            loadAd(
+                AdRequest.Builder()
+                    // Methods in the AdRequest.Builder class can be used here to specify individual options settings.
+                    .build()
+            )
+        }
+    }
+
+    private fun loadInterstitialAd() {
+        val adRequestConfiguration = AdRequestConfiguration.Builder("R-M-3649610-2").build()
+        interstitialAdLoader?.loadAd(adRequestConfiguration)
+    }
+
+    private fun showAd() {
+        interstitialAd?.apply {
+            setAdEventListener(object : InterstitialAdEventListener {
+                override fun onAdShown() {
+                    // Called when ad is shown.
+                }
+                override fun onAdFailedToShow(adError: AdError) {
+                    // Called when an InterstitialAd failed to show.
+                    // Clean resources after Ad dismissed
+                    interstitialAd?.setAdEventListener(null)
+                    interstitialAd = null
+
+                    // Now you can preload the next interstitial ad.
+                    loadInterstitialAd()
+                }
+                override fun onAdDismissed() {
+                    // Called when ad is dismissed.
+                    // Clean resources after Ad dismissed
+                    interstitialAd?.setAdEventListener(null)
+                    interstitialAd = null
+
+                    // Now you can preload the next interstitial ad.
+                    loadInterstitialAd()
+                }
+                override fun onAdClicked() {
+                    // Called when a click is recorded for an ad.
+                }
+                override fun onAdImpression(impressionData: ImpressionData?) {
+                    // Called when an impression is recorded for an ad.
+                }
+            })
+            show(requireActivity())
+        }
     }
 
     private fun setOnClicks() = with(binding) {
         val listener = onClicks()
         fStartStop.setOnClickListener(listener)
+        fCenter.setOnClickListener(listener)
     }
 
     private fun onClicks(): OnClickListener {
@@ -97,8 +241,17 @@ class MainFragment : Fragment() {
                 R.id.fStartStop -> {
                     startStopService()
                 }
+
+                R.id.fCenter -> {
+                    centerLocation()
+                }
             }
         }
+    }
+
+    private fun centerLocation() {
+        binding.map.controller.animateTo(mLocOverlay.myLocation)
+        mLocOverlay.enableMyLocation()
     }
 
     private fun locationUpdates() = with(binding) {
@@ -168,8 +321,13 @@ class MainFragment : Fragment() {
                 track,
                 object : DialogManager.Listener {
                     override fun onClick() {
-                        showToast("Track Saved!")
-                        model.insertTrack(track)
+                        if (track.geoPoints != ""){
+                            model.insertTrack(track)
+                            showAd()
+                            showToast(getString(R.string.track_saved))
+                        } else {
+                            showToast(getString(R.string.track_not_saved_the_distance_is_not_covered))
+                        }
                     }
                 })
         }
@@ -181,10 +339,16 @@ class MainFragment : Fragment() {
             null,
             getCurrentTime(),
             TimeUtils.getDate(),
-            getString(R.string.distance_km_byRC, String.format("%.1f",
-                locationModel?.distance?.div(1000) ?: 0
-            )),
-            getString(R.string.average_velocity_km_h, getAverageSpeed(locationModel?.distance ?: 0.0f)),
+            getString(
+                R.string.distance_km_byRC, String.format(
+                    "%.1f",
+                    locationModel?.distance?.div(1000) ?: 0.0f
+                )
+            ),
+            getString(
+                R.string.average_velocity_km_h,
+                getAverageSpeed(locationModel?.distance ?: 0.0f)
+            ),
             geoPointsToString(locationModel?.geoPointsList ?: listOf())
         )
 
@@ -212,6 +376,8 @@ class MainFragment : Fragment() {
     override fun onResume() {
         super.onResume()
         checkLocPermission()
+        firstStart = true
+        Log.d("MyLog", "onResume")
     }
 
     private fun settingsOsm() {
@@ -228,19 +394,24 @@ class MainFragment : Fragment() {
             PreferenceManager.getDefaultSharedPreferences(requireContext())
                 .getString("color_key", "#DE0000")
         )
+        map.setBuiltInZoomControls(false)
+        fabZoomIn.setOnClickListener { map.controller.zoomIn() }
+        fabZoomOut.setOnClickListener { map.controller.zoomOut() }
+        map.setMultiTouchControls(true)
         map.controller.setZoom(20.0)
         val mLocProvide = GpsMyLocationProvider(activity)
-        val mLocOverlay = MyLocationNewOverlay(mLocProvide, map)
+        mLocOverlay = MyLocationNewOverlay(mLocProvide, map)
         mLocOverlay.enableMyLocation()
         mLocOverlay.enableFollowLocation()
         mLocOverlay.runOnFirstFix {
             map.overlays.clear()
-            map.overlays.add(mLocOverlay)
             map.overlays.add(pl)
+            map.overlays.add(mLocOverlay)
         }
     }
 
     private fun registerPermission() {
+        PackageManager.PERMISSION_GRANTED 
         pLauncher =
             registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) {
                 if (it[Manifest.permission.ACCESS_FINE_LOCATION] == true) {
@@ -325,8 +496,6 @@ class MainFragment : Fragment() {
                     }
                 }
             )
-        } else {
-            showToast("GPS включен")
         }
     }
 
@@ -348,7 +517,7 @@ class MainFragment : Fragment() {
     }
 
     private fun addPoint(list: List<GeoPoint>) {
-        pl?.addPoint(list[list.size - 1])
+        if (list.isNotEmpty()) pl?.addPoint(list[list.size - 1])
     }
 
     private fun fillPolyLine(list: List<GeoPoint>) {

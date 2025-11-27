@@ -12,8 +12,8 @@ android {
         applicationId = "legom.gpstracker"
         minSdk = 21
         targetSdk = 34
-        versionCode = 1
-        versionName = "1.0"
+        versionCode = 5
+        versionName = "1.0.5"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -43,6 +43,14 @@ android {
 
 
 dependencies {
+
+    //Yandex sdk
+    implementation ("com.yandex.android:mobileads:7.16.1")
+    implementation("com.yandex.ads.mediation:mobileads-mytarget:5.27.3.1")
+    implementation("io.appmetrica.analytics:analytics:7.13.0")
+//    implementation("com.yandex.ads.mediation:mobileads-mintegral:16.9.81.2")
+////
+//    implementation("com.mbridge.msdk.oversea:mbridge_android_sdk:17.0.21")
 
     implementation(libs.androidx.room.ktx)
     ksp(libs.androidx.room.compiler)
